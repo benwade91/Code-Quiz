@@ -36,15 +36,6 @@ p {
     text-align: center;
 }
 
-ul {
-    list-style: none;
-    width: 50%;
-}
-li {
-    color: var(--quarternary);
-    padding-right: 35px;
-}
-
 .highScore a{
     padding: 30px 60px;
     text-decoration: none;
@@ -54,10 +45,18 @@ li {
 .timer {
     padding: 30px 60px;
 }
-
-.answers {
+.choiceBox {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.choices {
     display: flex;
     text-align: center;
     background-color: var(--tertiary);
     border-radius: 20px;
+    cursor: pointer;
+    width: 20%;
+    justify-content: center;
+    margin: 5px;
 }
