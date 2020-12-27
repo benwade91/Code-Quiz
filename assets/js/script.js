@@ -131,7 +131,7 @@ var questionHandler = function (correctA) {
 
 var correct = function () {
     round++;
-    score += 5;
+    score += 3;
     timer = timer + 5;
     answerChk.textContent = "Correct! Score: " + score;
     setTimeout(function () {
@@ -142,7 +142,9 @@ var correct = function () {
 
 var incorrect = function () {
     round++;
-    score--;
+    if (score >= 1) {
+        score--;
+    }
     timer = timer - 5;
     answerChk.textContent = "Incorrect! Score: " + score;
     setTimeout(function () {
@@ -163,6 +165,9 @@ var scoreInput = function () {
     var myHS = {};
     myHS.name = (document.querySelector("input").value);
     myHS.score = JSON.stringify(score);
+    while (!myHS.name) {
+        myHS.name = prompt("Whats your initials?");
+    }
     saveScore(myHS);
     showScores()
 }
@@ -200,7 +205,9 @@ var saveScore = function (myHS) {
         } else if (scoreHistory[2].score <= myHS.score) {
             scoreHistory.splice(2, 0, myHS);
             console.log("case 3");
-        } else { console.log("no high score");}
+        } else {
+            console.log("no high score");
+        }
         console.log("case 4");
     }
     localStorage.setItem("user", JSON.stringify(scoreHistory));
