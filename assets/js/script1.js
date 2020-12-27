@@ -1,10 +1,22 @@
-var highScores = [];
-var scoreHistory;
+var highScores = [{
+    name: "bot",
+    score: 0
+}, {
+    name: "bot",
+    score: 0
+}, {
+    name: "bot",
+    score: 0
+}];
+var first = highScores[0];
+var second = highScores[1];
+var third = highScores[2];
 var timer = 59;
-var countdown;
 var time = document.getElementById("time");
 var score = 0;
 var round = 0;
+var objID = Math.random();
+var arrayLooper = 0;
 var inputForm = document.querySelector("#inputForm");
 var viewHS = document.querySelector("#viewHS");
 var startEl = document.querySelector("#start");
@@ -47,15 +59,18 @@ var questions = [{
     answer: "D"
 }];
 
+var timeDown = function () {
+    time.textContent = "Time: " + timer;
+    timer--;
+    if (timer < 0) {
+        clearInterval(startCount);
+        time.textContent = "Times Up!"
+        gameOver();
+    }
+}
+
 var startCount = function () {
-    countdown = setInterval(function () {
-        time.textContent = "Time: " + timer;
-        timer--;
-        if (timer < 0) {
-            time.textContent = "Times Up!"
-            gameOver();
-        }
-    }, 1000);
+    setInterval(timeDown, 1000);
 }
 
 var startGame = function () {
@@ -152,62 +167,29 @@ var incorrect = function () {
 }
 
 var gameOver = function () {
-    clearInterval(countdown);
     time.remove();
     questionEl.textContent = "Game Over!"
     choiceBox.innerHTML = "<form id='inputForm'><input class='initials' id='initials' placeholder='Your Initials'><button class='btn' type='submit'>OK</button></form>";
 }
 
+viewHS.onclick = function () {
+    showScores();
+}
+
 var scoreInput = function () {
-    event.preventDefault();
+    highScores = JSON.parse(localStorage.getItem("user"));
     var myHS = {};
-    myHS.name = (document.querySelector("input").value);
-    myHS.score = JSON.stringify(score);
-    saveScore(myHS);
+    myHS.name = document.querySelector("input").value;
+    myHS.score = score;
+    myHS.id = objID;
+    console.log(highScores[0]);
+    saveScore();
     showScores()
 }
 
-var saveScore = function (myHS) {
-    console.log(myHS);
-    highScores.push(myHS);
-    scoreHistory = JSON.parse(localStorage.getItem("user")) || [];
-    myHS.score = parseInt(score);
-
-    if (!scoreHistory[0]) {
-        scoreHistory.push(myHS);
-    } else if (!scoreHistory[1]) {
-        if (scoreHistory[0].score <= myHS.score) {
-            scoreHistory.unshift(myHS);
-        } else {
-            scoreHistory.push(myHS);
-        }
-    } else if (!scoreHistory[2]) {
-        console.log(scoreHistory[0].score);
-        if (scoreHistory[0].score <= myHS.score) {
-            scoreHistory.unshift(myHS);
-        } else if (scoreHistory[1].score <= myHS.score) {
-            scoreHistory.splice(1, 0, myHS);
-        } else {
-            scoreHistory.push(myHS);
-        }
-    } else if (!scoreHistory[3] || myHS.score >= scoreHistory[3].score) {
-        if (scoreHistory[0].score <= myHS.score) {
-            scoreHistory.unshift(myHS);
-            console.log("case 1");
-        } else if (scoreHistory[1].score <= myHS.score) {
-            scoreHistory.splice(1, 0, myHS);
-            console.log("case 2");
-        } else if (scoreHistory[2].score <= myHS.score) {
-            scoreHistory.splice(2, 0, myHS);
-            console.log("case 3");
-        } else { console.log("no high score");}
-        console.log("case 4");
-    }
-    localStorage.setItem("user", JSON.stringify(scoreHistory));
-
-
+var saveScore = function () {
+    localStorage.setItem("user", JSON.stringify(highScores));
 }
-
 var showScores = function () {
     event.preventDefault();
     viewHS.remove();
@@ -215,14 +197,12 @@ var showScores = function () {
     answerChk.textContent = "";
     choiceBox.innerHTML = "";
     questionEl.textContent = "High Scores";
-    scoreHistory = JSON.parse(localStorage.getItem("user"));
-    for (var i = 0; i < scoreHistory.length && i < 3; i++) {
-        var parsedObj = (scoreHistory[i]);
-        var previousScores = document.createElement("p");
-        choiceBox.className = "previousScores";
-        previousScores.innerHTML = parsedObj.name + " " + parsedObj.score;
-        choiceBox.appendChild(previousScores);
-    }
+    var highScore = JSON.parse(localStorage.getItem("user"));
+    // for (var i = 0; i < 3; i++) {
+    //     var previousScores = document.createElement("p");
+    //     previousScores.innerHTML = highScore[i].name;
+    //     choiceBox.appendChild(previousScores);
+    // }
 
     setTimeout(function () {
         tryAgain.className = "choices";
@@ -232,41 +212,9 @@ var showScores = function () {
     }, 4000);
 
 }
-var whosHighest = function () {
-    scoreHistory = JSON.parse(scoreHistory[0])
-    var first = {
-        score: -10
-    };
-    var second = {
-        score: -10
-    };
-    var third = {
-        score: -10
-    };
-    for (i = 0; i < scoreHistory.length; i++) {
-        if (scoreHistory[i].score >= first.score) {
-            third = second;
-            second = first;
-            first = scoreHistory[i];
-            console.log("firstplace");
-        } else if (scoreHistory[i].score < first.score && scoreHistory[i].score >= second.score) {
-            third = second;
-            second = scoreHistory[i];
-            console.log("secondplace");
-        } else if (scoreHistory[i].score < second.score && scoreHistory[i].score >= third.score) {
-            third = scoreHistory[i];
-            console.log("third");
-        } else {
-            console.log("fourth?");
-            console.log(scoreHistory[i].score);
-        }
-    }
-}
 tryAgain.onclick = function () {
     location.reload();
 }
-viewHS.onclick = function () {
-    showScores();
-}
+
 choiceBox.addEventListener("submit", scoreInput);
 startEl.addEventListener("click", startGame);
